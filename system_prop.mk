@@ -14,6 +14,12 @@
 # limitations under the License.
 #
 
+# adb for new bring up - turn on all adbd right away
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+    ro.debuggable=1 \
+    persist.service.adb.enable=1 \
+    persist.sys.usb.config=adb
+
 # Audio
 PRODUCT_PROPERTY_OVERRIDES += \
     aaudio.hw_burst_min_usec=2000 \
