@@ -216,8 +216,9 @@ PRODUCT_COPY_FILES += \
     $(COMMON_PATH)/hardware/sensors/_hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/_hals.conf
 
 # Shims
+#    libshim_camera \
+
 PRODUCT_PACKAGES += \
-    libshim_camera \
     libgutils
 
 # Soong namespaces
