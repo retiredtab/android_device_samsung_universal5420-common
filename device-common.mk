@@ -59,11 +59,13 @@ PRODUCT_PACKAGES += \
     libbt-vendor
 
 # Camera
-PRODUCT_PACKAGES += \
-    android.hardware.camera.provider@2.4-impl.exynos5420 \
-    android.hardware.camera.provider@2.4-service \
-    camera.device@1.0-impl.exynos5420 \
-    camera.universal5420
+#PRODUCT_PACKAGES += \
+#    android.hardware.camera.provider@2.4-impl.exynos5420 \
+#    android.hardware.camera.provider@2.4-service \
+#    camera.device@1.0-impl.exynos5420 \
+#    camera.universal5420
+
+PRODUCT_NO_CAMERA := true
 
 # ConfigStore
 PRODUCT_PACKAGES += \
