@@ -53,7 +53,8 @@ PRODUCT_PROPERTY_OVERRIDES += \
 
 # BPF
 PRODUCT_PROPERTY_OVERRIDES += \
-    ro.kernel.ebpf.supported=false
+    ro.kernel.ebpf.supported=false \
+    bpf.progs_loaded=1
 
 # fastbootd
 PRODUCT_PROPERTY_OVERRIDES += \
