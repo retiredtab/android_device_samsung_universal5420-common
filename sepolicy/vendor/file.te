@@ -59,3 +59,4 @@ type sysfs_rndis, fs_type, sysfs_type, mlstrustedobject;
 type sysfs_sensor, fs_type, sysfs_type, mlstrustedobject;
 type sysfs_v4l, fs_type, sysfs_type, mlstrustedobject;
 type sysfs_vibrator_writable, fs_type, sysfs_type, mlstrustedobject;
+type sysfs_sec_ir, fs_type, sysfs_type, mlstrustedobject;

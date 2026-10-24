@@ -279,3 +279,5 @@
 # ZRAM
 /sys/devices/virtual/block/zram0/disksize    u:object_r:sysfs_zram:s0
 /sys/devices/virtual/block/zram0/max_comp_streams    u:object_r:sysfs_zram:s0
+/sys/devices/virtual/sec/sec_ir/ir_send(_result)?  u:object_r:sysfs_sec_ir:s0
+/sys/class/sec/sec_ir/ir_send(_result)?          u:object_r:sysfs_sec_ir:s0
