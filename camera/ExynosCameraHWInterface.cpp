@@ -722,7 +722,9 @@ int HAL_getCameraInfo(int cameraId, struct camera_info *info)
         return -EINVAL;
     }
 
-    memcpy(info, &sCameraInfo[cameraId], sizeof(CameraInfo));
+    info->facing = sCameraInfo[cameraId].facing;
+    info->orientation = sCameraInfo[cameraId].orientation;
+    info->static_camera_characteristics = NULL;
     info->device_version = CAMERA_DEVICE_API_VERSION_1_0;
 
     return NO_ERROR;

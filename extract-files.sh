@@ -68,4 +68,7 @@ sed -i 's|system/app|vendor/app|g' $BLOB_ROOT/vendor/bin/mcDriverDaemon
 # Replace protobuf with vndk29 compat libs for specified libs
 "${PATCHELF}" --replace-needed libprotobuf-cpp-lite.so libprotobuf-cpp-lite-v29.so $BLOB_ROOT/vendor/lib/libMcClient.so
 
+# Vendor blobs cannot load the platform-only libcamera_client
+"${PATCHELF}" --replace-needed libcamera_client.so libcamera_parameters.so $BLOB_ROOT/vendor/lib/libexynoscamera.so
+
 "${MY_DIR}/setup-makefiles.sh"

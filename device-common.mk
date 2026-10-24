@@ -59,13 +59,13 @@ PRODUCT_PACKAGES += \
     libbt-vendor
 
 # Camera
-#PRODUCT_PACKAGES += \
-#    android.hardware.camera.provider@2.4-impl.exynos5420 \
-#    android.hardware.camera.provider@2.4-service \
-#    camera.device@1.0-impl.exynos5420 \
-#    camera.universal5420
-
-PRODUCT_NO_CAMERA := true
+PRODUCT_PACKAGES += \
+    android.hardware.camera.provider@2.4-impl.exynos5420 \
+    android.hardware.camera.provider@2.4-service \
+    camera.device@1.0-impl.exynos5420 \
+    camera.universal5420 \
+    libhwjpeg \
+    libion_exynos
 
 # ConfigStore
 PRODUCT_PACKAGES += \
@@ -219,7 +219,8 @@ PRODUCT_COPY_FILES += \
     $(COMMON_PATH)/hardware/sensors/_hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/_hals.conf
 
 # Shims
-#    libshim_camera \
+PRODUCT_PACKAGES += \
+    libshim_camera
 
 PRODUCT_PACKAGES += \
     libgutils

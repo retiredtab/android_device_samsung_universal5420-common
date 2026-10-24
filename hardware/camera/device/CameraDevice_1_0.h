@@ -179,6 +179,18 @@ private:
 
     bool mMetadataMode = false;
 
+    // The Exynos HAL only delivers video frames as 20-byte metadata {0, fdY, fdCbCr, index, 0}.
+    // When the client asks for plain YUV frames, copy them out of those buffers ourselves.
+    bool mConvertToYuv = false;
+    int mYuvWidth = 0;
+    int mYuvHeight = 0;
+    CameraHeapMemory* mYuvPool = nullptr;
+    uint32_t mYuvNext = 0;
+    static constexpr uint32_t kYuvPoolSize = 8;
+    bool convertVideoFrame(nsecs_t timestamp, int32_t msg_type, CameraHeapMemory* mem,
+            unsigned index);
+    void releaseYuvPool();
+
     mutable Mutex mBatchLock;
     // Start of protection scope for mBatchLock
     uint32_t mBatchSize = 0; // 0 for non-batch mode, set to other value to start batching

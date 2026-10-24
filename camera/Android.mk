@@ -15,6 +15,20 @@
 LOCAL_PATH := $(call my-dir)
 
 #################
+# libcamera_parameters: vendor copy of CameraParameters (libcamera_client is platform-only)
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := ../../../../frameworks/av/camera/CameraParameters.cpp
+LOCAL_C_INCLUDES += frameworks/av/camera/include
+LOCAL_SHARED_LIBRARIES := libutils libcutils liblog
+LOCAL_MODULE := libcamera_parameters
+LOCAL_MODULE_TAGS := optional
+LOCAL_VENDOR_MODULE := true
+
+include $(BUILD_SHARED_LIBRARY)
+
+#################
 # libexynoscamera
 
 include $(CLEAR_VARS)
@@ -26,7 +40,7 @@ LOCAL_SHARED_LIBRARIES := \
     libbinder \
     libhardware \
     liblog \
-    libcamera_client \
+    libcamera_parameters \
     libgui_vendor \
     libhidlbase \
     libsensor_vendor \
@@ -43,7 +57,7 @@ LOCAL_CFLAGS += -DGAIA_FW_BETA
 
 LOCAL_C_INCLUDES += \
     system/media/camera/include \
-    framworks/av/include/camera \
+    frameworks/av/camera/include \
     frameworks/native/headers/media_plugin
 
 LOCAL_SRC_FILES:= \
@@ -55,6 +69,7 @@ LOCAL_HEADER_LIBRARIES += \
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE := libexynoscamera
 LOCAL_VENDOR_MODULE := true
+LOCAL_UNINSTALLABLE_MODULE := true
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -69,7 +84,7 @@ LOCAL_MODULE_RELATIVE_PATH := hw
 
 LOCAL_C_INCLUDES += \
     system/media/camera/include \
-    framworks/av/include/camera \
+    frameworks/av/camera/include \
     frameworks/native/headers/media_plugin
 
 LOCAL_SRC_FILES := \
@@ -81,7 +96,7 @@ LOCAL_SHARED_LIBRARIES := \
     libbinder \
     libhardware \
     liblog \
-    libcamera_client \
+    libcamera_parameters \
     libgui_vendor \
     libhidlbase \
     libsensor_vendor \

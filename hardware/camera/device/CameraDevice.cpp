@@ -25,6 +25,7 @@
 #include <media/hardware/HardwareAPI.h> // For VideoNativeHandleMetadata
 #include "CameraDevice_1_0.h"
 #include <binder/MemoryHeapIon.h>
+#include <sys/mman.h>
 
 
 namespace android {
@@ -492,6 +493,12 @@ void CameraDevice::sDataCbTimestamp(nsecs_t timestamp, int32_t msg_type,
         return;
     }
 
+    if (device->mConvertToYuv && msg_type == CAMERA_MSG_VIDEO_FRAME && mem->mBufSize == 20) {
+        if (device->convertVideoFrame(timestamp, msg_type, mem.get(), index)) {
+            return;
+        }
+    }
+
     native_handle_t* handle = nullptr;
     if (device->mMetadataMode) {
         if (mem->mBufSize == sizeof(VideoNativeHandleMetadata)) {
@@ -511,6 +518,85 @@ void CameraDevice::sDataCbTimestamp(nsecs_t timestamp, int32_t msg_type,
             device->handleCallbackTimestamp(timestamp, msg_type, mem->handle.mId, index, handle);
         }
     }
+}
+
+bool CameraDevice::convertVideoFrame(nsecs_t timestamp, int32_t msg_type, CameraHeapMemory* mem,
+        unsigned index) {
+    uint8_t* halFrame = (uint8_t*) mem->mHidlHeapMemData + index * mem->mBufSize;
+    const uint32_t* md = (const uint32_t*) halFrame;
+    int fdY = (int) md[1];
+    int fdC = (int) md[2];
+
+    if (mYuvWidth == 0 || mYuvHeight == 0) {
+        // video-size=WxH from the HAL parameters
+        if (mDevice && mDevice->ops->get_parameters) {
+            char* params = mDevice->ops->get_parameters(mDevice);
+            if (params != nullptr) {
+                const char* p = strstr(params, "video-size=");
+                int w = 0, h = 0;
+                if (p != nullptr && sscanf(p, "video-size=%dx%d", &w, &h) == 2) {
+                    mYuvWidth = w;
+                    mYuvHeight = h;
+                }
+                if (mDevice->ops->put_parameters) mDevice->ops->put_parameters(mDevice, params);
+            }
+        }
+        if (mYuvWidth == 0 || mYuvHeight == 0) {
+            ALOGE("%s: unknown video size, dropping frame", __FUNCTION__);
+            mDevice->ops->release_recording_frame(mDevice, halFrame);
+            return true;
+        }
+    }
+
+    const size_t ySize = (size_t) mYuvWidth * mYuvHeight;
+    const size_t cSize = ySize / 2;
+    // The video encoder lays the CbCr plane after the luma plane padded to a 16-row slice height
+    const size_t yPlane = (size_t) mYuvWidth * ((mYuvHeight + 15) & ~15);
+    const size_t frameSize = yPlane + cSize;
+
+    if (mYuvPool == nullptr) {
+        int heapFd = -1;
+        camera_memory_t* m = sGetMemory(-1, frameSize, kYuvPoolSize, &heapFd);
+        if (m == nullptr) {
+            ALOGE("%s: cannot allocate the YUV pool", __FUNCTION__);
+            mDevice->ops->release_recording_frame(mDevice, halFrame);
+            return true;
+        }
+        mYuvPool = static_cast<CameraHeapMemory*>(m->handle);
+        mYuvNext = 0;
+    }
+
+    void* y = mmap(nullptr, ySize, PROT_READ, MAP_SHARED, fdY, 0);
+    void* c = mmap(nullptr, cSize, PROT_READ, MAP_SHARED, fdC, 0);
+    bool ok = (y != MAP_FAILED && c != MAP_FAILED);
+    uint32_t slot = mYuvNext;
+    if (ok) {
+        uint8_t* dst = (uint8_t*) mYuvPool->mHidlHeapMemData + slot * mYuvPool->mBufSize;
+        memcpy(dst, y, ySize);
+        memcpy(dst + yPlane, c, cSize);
+        mYuvNext = (mYuvNext + 1) % kYuvPoolSize;
+    } else {
+        ALOGE("%s: cannot map the video frame buffers (fds %d, %d)", __FUNCTION__, fdY, fdC);
+    }
+    if (y != MAP_FAILED) munmap(y, ySize);
+    if (c != MAP_FAILED) munmap(c, cSize);
+
+    // The HAL buffer is not needed any more
+    mDevice->ops->release_recording_frame(mDevice, halFrame);
+
+    if (ok && mDeviceCallback != nullptr) {
+        mDeviceCallback->dataCallbackTimestamp(
+                (DataCallbackMsg) msg_type, mYuvPool->handle.mId, slot, timestamp);
+    }
+    return true;
+}
+
+void CameraDevice::releaseYuvPool() {
+    if (mYuvPool != nullptr) {
+        sPutMemory(&mYuvPool->handle);
+        mYuvPool = nullptr;
+    }
+    mYuvWidth = mYuvHeight = 0;
 }
 
 void CameraDevice::initHalPreviewWindow()
@@ -772,6 +858,15 @@ Return<Status> CameraDevice::storeMetaDataInBuffers(bool enable) {
         status_t s = mDevice->ops->store_meta_data_in_buffers(mDevice, enable);
         if (s == OK && enable) {
             mMetadataMode = true;
+            mConvertToYuv = false;
+        } else if (s == -ENOSYS && !enable) {
+            // The HAL cannot deliver YUV frames: keep its metadata mode and convert the frames
+            s = mDevice->ops->store_meta_data_in_buffers(mDevice, true);
+            if (s == OK) {
+                mMetadataMode = true;
+                mConvertToYuv = true;
+                mYuvWidth = mYuvHeight = 0;
+            }
         }
         return getHidlStatus(s);
     }
@@ -801,6 +896,7 @@ Return<void> CameraDevice::stopRecording() {
     if (mDevice->ops->stop_recording) {
         mDevice->ops->stop_recording(mDevice);
     }
+    releaseYuvPool();
     return Void();
 }
 
@@ -822,6 +918,9 @@ void CameraDevice::releaseRecordingFrameLocked(
     if (!mDevice) {
         ALOGE("%s called while camera is not opened", __FUNCTION__);
         return;
+    }
+    if (mYuvPool != nullptr && memId == mYuvPool->handle.mId) {
+        return;  // converted copy, the HAL frame was already released
     }
     if (mDevice->ops->release_recording_frame) {
         CameraHeapMemory* camMemory;
@@ -997,6 +1096,8 @@ Return<void> CameraDevice::close() {
 
 void CameraDevice::closeLocked() {
     ALOGI("Closing camera %s", mCameraId.c_str());
+    releaseYuvPool();
+    mConvertToYuv = false;
     if(mDevice) {
         int rc = mDevice->common.close(&mDevice->common);
         if (rc != OK) {

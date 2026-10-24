@@ -165,7 +165,8 @@ SYSTEM_EXT_PRIVATE_SEPOLICY_DIRS += $(COMMON_PATH)/sepolicy/private
 SELINUX_IGNORE_NEVERALLOWS := true
 
 # Shims
-#    /vendor/lib/libexynoscamera.so|/vendor/lib/libshim_camera.so
+TARGET_LD_SHIM_LIBS += \
+    /vendor/lib/libexynoscamera.so|/vendor/lib/libshim_camera.so
 TARGET_LD_SHIM_LIBS += \
     /vendor/lib/egl/libGLES_mali.so|/vendor/lib/libgutils.so
 
