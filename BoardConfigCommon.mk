@@ -119,6 +119,7 @@ TARGET_BOOTLOADER_BOARD_NAME := universal5420
 
 # Power
 TARGET_POWERHAL_VARIANT := samsung
+include device/lineage/sepolicy/libperfmgr/sepolicy.mk
 
 # Recovery
 BOARD_RECOVERY_SWIPE := true
