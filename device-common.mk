@@ -129,8 +129,8 @@ PRODUCT_PACKAGES += \
     android.hardware.light-service.samsung
 
 # Livedisplay
-#PRODUCT_PACKAGES += \
-#    vendor.lineage.livedisplay@2.0-service.samsung-exynos
+PRODUCT_PACKAGES += \
+    vendor.lineage.livedisplay@2.0-service.samsung-exynos
 
 # Media
 PRODUCT_COPY_FILES += \
@@ -239,7 +239,6 @@ PRODUCT_SOONG_NAMESPACES += \
     hardware/lineage/interfaces/power-libperfmgr
 
 # Touch features
-#     vendor.lineage.touch@1.0-service.samsung
 PRODUCT_PACKAGES += \
     vendor.lineage.touch@1.0
 
