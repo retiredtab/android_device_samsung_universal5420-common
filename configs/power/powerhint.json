@@ -9,6 +9,7 @@
                 "1300000",
                 "600000",
             ],
+            "DefaultIndex": 1,
             "ResetOnInit": true
         },
         {
