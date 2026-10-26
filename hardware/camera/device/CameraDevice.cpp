@@ -26,6 +26,8 @@
 #include "CameraDevice_1_0.h"
 #include <binder/MemoryHeapIon.h>
 #include <sys/mman.h>
+#include <fcntl.h>
+#include <unistd.h>
 
 
 namespace android {
@@ -680,9 +682,23 @@ Return<void> CameraDevice::getCameraInfo(getCameraInfo_cb _hidl_cb) {
     return Void();
 }
 
+// The Exynos HAL1 module has no set_torch_mode; the rear flash LED is driven through sysfs
+static const char* const kRearFlashNode = "/sys/class/camera/flash/rear_flash";
+
 Return<Status> CameraDevice::setTorchMode(TorchMode mode) {
     if (!mModule->isSetTorchModeSupported()) {
-        return Status::METHOD_NOT_SUPPORTED;
+        if (mCameraId != "0") {
+            return Status::METHOD_NOT_SUPPORTED;
+        }
+        int fd = ::open(kRearFlashNode, O_WRONLY);
+        if (fd < 0) {
+            ALOGE("%s: cannot open %s: %s", __FUNCTION__, kRearFlashNode, strerror(errno));
+            return Status::INTERNAL_ERROR;
+        }
+        const char* value = (mode == TorchMode::ON) ? "1" : "0";
+        ssize_t n = ::write(fd, value, 1);
+        ::close(fd);
+        return (n == 1) ? Status::OK : Status::INTERNAL_ERROR;
     }
 
     Status status = initStatus();
