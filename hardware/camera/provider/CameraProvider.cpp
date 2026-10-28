@@ -355,8 +355,8 @@ Return<void> CameraProvider::getCameraIdList(getCameraIdList_cb _hidl_cb)  {
 }
 
 Return<void> CameraProvider::isSetTorchModeSupported(isSetTorchModeSupported_cb _hidl_cb) {
-    bool support = mModule->isSetTorchModeSupported();
-    _hidl_cb (Status::OK, support);
+    // The HAL1 devices drive the flash LED themselves when the module cannot (see CameraDevice)
+    _hidl_cb (Status::OK, true);
     return Void();
 }
 

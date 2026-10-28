@@ -59,21 +59,21 @@ PRODUCT_PACKAGES += \
     libbt-vendor
 
 # Camera
-#PRODUCT_PACKAGES += \
-#    android.hardware.camera.provider@2.4-impl.exynos5420 \
-#    android.hardware.camera.provider@2.4-service \
-#    camera.device@1.0-impl.exynos5420 \
-#    camera.universal5420
-
-PRODUCT_NO_CAMERA := true
+PRODUCT_PACKAGES += \
+    android.hardware.camera.provider@2.4-impl.exynos5420 \
+    android.hardware.camera.provider@2.4-service \
+    camera.device@1.0-impl.exynos5420 \
+    camera.universal5420 \
+    libhwjpeg \
+    libion_exynos
 
 # ConfigStore
 PRODUCT_PACKAGES += \
     disable_configstore
 
 # IR
-#PRODUCT_PACKAGES += \
-#    android.hardware.ir@1.0-impl
+PRODUCT_PACKAGES += \
+    android.hardware.ir@1.0-service.samsung
 
 # DRM
 PRODUCT_PACKAGES += \
@@ -129,8 +129,8 @@ PRODUCT_PACKAGES += \
     android.hardware.light-service.samsung
 
 # Livedisplay
-#PRODUCT_PACKAGES += \
-#    vendor.lineage.livedisplay@2.0-service.samsung-exynos
+PRODUCT_PACKAGES += \
+    vendor.lineage.livedisplay@2.0-service.samsung-exynos
 
 # Media
 PRODUCT_COPY_FILES += \
@@ -152,8 +152,8 @@ PRODUCT_PACKAGES +=  \
     com.android.tethering.inprocess
 
 # Power
-#PRODUCT_PACKAGES += \
-#    android.hardware.power-service.samsung-libperfmgr
+PRODUCT_PACKAGES += \
+    android.hardware.power-service.lineage-libperfmgr
 
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/configs/power/powerhint.json:$(TARGET_COPY_OUT_VENDOR)/etc/powerhint.json
@@ -175,6 +175,7 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.sensor.proximity.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.sensor.proximity.xml \
     frameworks/native/data/etc/android.hardware.touchscreen.multitouch.distinct.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.touchscreen.multitouch.distinct.xml \
     frameworks/native/data/etc/android.hardware.usb.accessory.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.usb.accessory.xml \
+    frameworks/native/data/etc/android.hardware.consumerir.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.consumerir.xml \
     frameworks/native/data/etc/android.hardware.usb.host.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.usb.host.xml \
     frameworks/native/data/etc/android.hardware.wifi.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.xml \
     frameworks/native/data/etc/android.hardware.wifi.direct.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.direct.xml \
@@ -218,7 +219,8 @@ PRODUCT_COPY_FILES += \
     $(COMMON_PATH)/hardware/sensors/_hals.conf:$(TARGET_COPY_OUT_VENDOR)/etc/sensors/_hals.conf
 
 # Shims
-#    libshim_camera \
+PRODUCT_PACKAGES += \
+    libshim_camera
 
 PRODUCT_PACKAGES += \
     libgutils
@@ -236,10 +238,9 @@ PRODUCT_SOONG_NAMESPACES += \
     hardware/google/interfaces \
     hardware/google/pixel \
     hardware/samsung \
-    hardware/samsung/aidl/power-libperfmgr
+    hardware/lineage/interfaces/power-libperfmgr
 
 # Touch features
-#     vendor.lineage.touch@1.0-service.samsung
 PRODUCT_PACKAGES += \
     vendor.lineage.touch@1.0
 
@@ -252,9 +253,8 @@ PRODUCT_PACKAGES += \
     android.hardware.usb@1.3-service.basic
 
 # Vibrator
-#PRODUCT_PACKAGES += \
-#    android.hardware.vibrator@1.0-impl \
-#    android.hardware.vibrator@1.0-service
+PRODUCT_PACKAGES += \
+    android.hardware.vibrator-service.samsung
 
 # VNDK prebuilts
 PRODUCT_COPY_FILES += \

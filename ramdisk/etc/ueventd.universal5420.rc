@@ -38,7 +38,7 @@
 # Mali Device
 /sys/devices/platform/mali.0  power_policy    0644    system  system
 /sys/devices/platform/mali.0  dvfs_table      0644    radio   system
-/sys/devices/platform/mali.0  dvfs_min_lock   0644    radio   system
+/sys/devices/platform/mali.0  dvfs_min_lock   0664    radio   system
 /sys/devices/platform/mali.0  dvfs_max_lock   0644    radio   system
 /sys/devices/platform/mali.0  highspeed_clock 0644    radio   system
 /sys/devices/platform/mali.0  highspeed_load  0644    radio   system

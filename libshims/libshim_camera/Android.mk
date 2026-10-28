@@ -1,0 +1,20 @@
+LOCAL_PATH := $(call my-dir)
+
+include $(CLEAR_VARS)
+
+LOCAL_SRC_FILES := camera_shim.cpp
+LOCAL_MODULE := libshim_camera
+LOCAL_MODULE_TAGS := optional
+LOCAL_MODULE_CLASS := SHARED_LIBRARIES
+LOCAL_VENDOR_MODULE := true
+
+LOCAL_SHARED_LIBRARIES:= libutils libcutils liblog
+
+LOCAL_CFLAGS += -Wno-unused-parameter
+#LOCAL_CFLAGS += -DGAIA_FW_BETA
+#LOCAL_CFLAGS += -DUSE_CAMERA_ESD_RESET
+
+#TARGET_SOC: exynos5420 TARGET_BOARD_PLATFORM: exynos5
+
+
+include $(BUILD_SHARED_LIBRARY)
