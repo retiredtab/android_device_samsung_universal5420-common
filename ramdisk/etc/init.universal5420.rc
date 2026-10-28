@@ -65,6 +65,8 @@ on post-fs-data
 on boot
     # Reduce reserved lowmem from ~48MB to ~12MB
     write /proc/sys/vm/lowmem_reserve_ratio "128 128"
+    # Wake kswapd earlier so apps stall less in direct reclaim
+    write /proc/sys/vm/min_free_kbytes 12288
 
     # Set up kernel tracing, but disable it by default
     chmod 0222 /sys/kernel/debug/tracing/trace_marker
